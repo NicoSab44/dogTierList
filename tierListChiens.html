@@ -215,7 +215,8 @@
             breedLink.title = `Voir ${breed}`;
             breedLink.href = `https://www.dogbreedinfo.com/${breed.replace(/\s+/g, '').toLowerCase()}.htm`;
             breedLink.className = 'tier-label bg-unranked py-3 rounded-lg text-white font-bold p-2 text-center font-medium text-gray-800 truncate';
-            
+            breedLink.target = '_blank;
+                
             card.appendChild(imgDiv);
             card.appendChild(nameDiv);
             card.appendChild(breedLink);
