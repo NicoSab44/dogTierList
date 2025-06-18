@@ -1,343 +1,1172 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dog Breed Tier List</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        tierS: '#ff7b7b',
-                        tierA: '#ffb07b',
-                        tierB: '#ffdf7b',
-                        tierC: '#a2ff7b',
-                        tierD: '#7bd9ff',
-                        tierF: '#d17bff',
-                        unranked: '#e5e7eb'
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              tierS: "#ff7b7b",
+              tierA: "#ffb07b",
+              tierB: "#ffdf7b",
+              tierC: "#a2ff7b",
+              tierD: "#7bd9ff",
+              tierF: "#d17bff",
+              unranked: "#e5e7eb",
+            },
+          },
+        },
+      };
     </script>
     <style>
-        .breed-card {
-            transition: all 0.2s ease;
+      .breed-card {
+        transition: all 0.2s ease;
+      }
+      .breed-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+      .tier-column {
+        min-height: 150px;
+      }
+      .drag-over {
+        background-color: rgba(255, 255, 255, 0.3);
+        border: 2px dashed #4b5563;
+      }
+      .breed-image {
+        background-size: cover;
+        background-position: center;
+      }
+      .holographic-bg {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 0, 150, 0.3),
+          rgba(0, 204, 255, 0.3),
+          rgba(255, 255, 0, 0.3)
+        );
+        background-size: 300% 300%;
+        animation: gradient 5s ease infinite;
+      }
+
+      @keyframes gradient {
+        0% {
+          background-position: 0% 50%;
         }
-        .breed-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        50% {
+          background-position: 100% 50%;
         }
-        .tier-column {
-            min-height: 150px;
+        100% {
+          background-position: 0% 50%;
         }
-        .drag-over {
-            background-color: rgba(255, 255, 255, 0.3);
-            border: 2px dashed #4b5563;
-        }
-        .breed-image {
-            background-size: cover;
-            background-position: center;
-        }
-        .scroll-container {
-            scrollbar-width: thin;
-            scrollbar-color: #cbd5e1 #f1f5f9;
-        }
-        .scroll-container::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        .scroll-container::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-        .scroll-container::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-        }
+      }
+      .card-shine-effect {
+        --shine-deg: 45deg;
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.875rem;
+        border: 1px solid rgb(15 23 42);
+        /* background-color: rgb(9 9 11); */
+        /* padding: 4rem 2rem; */
+        /* box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); */
+        /* max-width: 28rem; */
+
+        /* background-repeat: no-repeat; */
+        /* background-position: -100% 0, 0 0; */
+
+        /* background-image: linear-gradient(
+          var(--shine-deg),
+          transparent 20%,
+          transparent 40%,
+          rgb(68, 68, 68, 0.2) 50%,
+          rgb(68, 68, 68, 0.2) 55%,
+          transparent 70%,
+          transparent 100%
+        ); */
+
+        background-size: 250% 250%, 100% 100%;
+        transition: background-position 0s ease;
+        /* background-position: 200%0, 0 0;
+        transition-duration: 0.5s; */
+      }
+
+      .card-shine-effect:hover {
+        background-position: 200%0, 0 0;
+        transition-duration: 1.5s;
+      }
+      .scroll-container {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 #f1f5f9;
+      }
+      .scroll-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .scroll-container::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+      }
+      .scroll-container::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 4px;
+      }
     </style>
-</head>
-<body class="bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen">
+  </head>
+  <body class="bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-indigo-900 mb-4">Classement des Races de Chiens</h1>
-            <p class="text-lg text-gray-700 max-w-2xl mx-auto">
-                Glissez-déposez les races de chiens pour les classer dans différents niveaux. Créez votre classement ultime !
-            </p>
-            <div class="mt-6">
-                <button id="save-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-md font-medium mr-3 transition">
-                    <i class="fas fa-save mr-2"></i>Sauvegarder
-                </button>
-                <button id="reset-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg shadow-md font-medium transition">
-                    <i class="fas fa-redo mr-2"></i>Tout réinitialiser
-                </button>
-            </div>
-        </header>
-
-        <!-- Tier List Container -->
-        <div class="bg-gray-600 rounded-2xl shadow-xl overflow-hidden mb-12">
-            <!-- Tier Rows -->
-            <div class="grid  gap-4 p-4">
-                <div class="flex items-center gap-4">
-                    <div class="tier-label bg-tierS py-3 rounded-lg text-center w-24 text-white font-bold">Niveau S</div>
-                    <div class="tier-row bg-tierS/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-s" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="tier-label bg-tierA py-3 rounded-lg text-center w-24 text-white font-bold">Niveau A</div>
-                    <div class="tier-row bg-tierA/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-a" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="tier-label bg-tierB py-3 rounded-lg text-center w-24 text-white font-bold">Niveau B</div>
-                    <div class="tier-row bg-tierB/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-b" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="tier-label bg-tierC py-3 rounded-lg text-center w-24 text-white font-bold">Niveau C</div>
-                    <div class="tier-row bg-tierC/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-c" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="tier-label bg-tierD py-3 rounded-lg text-center w-24 text-white font-bold">Niveau D</div>
-                    <div class="tier-row bg-tierD/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-d" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="tier-label bg-tierF py-3 rounded-lg text-center w-24 text-white font-bold">Niveau F</div>
-                    <div class="tier-row bg-tierF/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-f" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-                </div>
-            </div>
+      <!-- Header -->
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-indigo-900 mb-4">
+          Classement des Races de Chiens
+        </h1>
+        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+          Glissez-déposez les races de chiens pour les classer dans différents
+          niveaux. Créez votre classement ultime !
+        </p>
+        <div class="mt-6">
+          <button
+            id="save-btn"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-md font-medium mr-3 transition"
+          >
+            <i class="fas fa-save mr-2"></i>Sauvegarder
+          </button>
+          <button
+            id="reset-btn"
+            class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg shadow-md font-medium transition"
+          >
+            <i class="fas fa-redo mr-2"></i>Tout réinitialiser
+          </button>
         </div>
+      </header>
 
-        <!-- Unranked Breeds -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="bg-gray-800 text-white font-bold p-4">
-                <h2 class="text-xl"><i class="fas fa-paw mr-2"></i>Races non classées</h2>
-                <p class="text-sm font-normal opacity-80 mt-1">Glissez les races d'ici vers le classement ci-dessus</p>
+      <!-- Tier List Container -->
+      <div class="bg-gray-600 rounded-2xl shadow-xl overflow-hidden mb-12">
+        <!-- Tier Rows -->
+        <div class="grid gap-4 p-4">
+          <div class="flex items-center gap-4">
+            <div
+              name="tier-s"
+              class="tier-label bg-tierS py-3 rounded-lg text-center w-24 text-white font-bold"
+            >
+              Niveau S
             </div>
-            <div class="p-4">
-                <div class="flex flex-wrap gap-3" id="unranked-breeds"></div>
+            <div
+              class="tier-row bg-tierS/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]"
+              id="tier-s"
+              ondrop="drop(event)"
+              ondragover="allowDrop(event)"
+            ></div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div
+              class="tier-label bg-tierA py-3 rounded-lg text-center w-24 text-white font-bold"
+            >
+              Niveau A
             </div>
+            <div
+              class="tier-row bg-tierA/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]"
+              id="tier-a"
+              ondrop="drop(event)"
+              ondragover="allowDrop(event)"
+            ></div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div
+              class="tier-label bg-tierB py-3 rounded-lg text-center w-24 text-white font-bold"
+            >
+              Niveau B
+            </div>
+            <div
+              class="tier-row bg-tierB/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]"
+              id="tier-b"
+              ondrop="drop(event)"
+              ondragover="allowDrop(event)"
+            ></div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div
+              class="tier-label bg-tierC py-3 rounded-lg text-center w-24 text-white font-bold"
+            >
+              Niveau C
+            </div>
+            <div
+              class="tier-row bg-tierC/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]"
+              id="tier-c"
+              ondrop="drop(event)"
+              ondragover="allowDrop(event)"
+            ></div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div
+              class="tier-label bg-tierD py-3 rounded-lg text-center w-24 text-white font-bold"
+            >
+              Niveau D
+            </div>
+            <div
+              class="tier-row bg-tierD/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]"
+              id="tier-d"
+              ondrop="drop(event)"
+              ondragover="allowDrop(event)"
+            ></div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div
+              class="tier-label bg-tierF py-3 rounded-lg text-center w-24 text-white font-bold"
+            >
+              Niveau F
+            </div>
+            <div
+              class="tier-row bg-tierF/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]"
+              id="tier-f"
+              ondrop="drop(event)"
+              ondragover="allowDrop(event)"
+            ></div>
+          </div>
         </div>
+      </div>
 
-        <!-- Footer -->
-        <footer class="mt-12 text-center text-gray-600">
-            <p>Données des races fournies par <a href="https://dog.ceo/dog-api/" class="text-indigo-600 hover:underline">Dog CEO API</a></p>
-            <p class="mt-2">Créé avec ❤️ pour les amoureux des chiens</p>
-        </footer>
+      <!-- Unranked Breeds -->
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-gray-800 text-white font-bold p-4">
+          <h2 class="text-xl holographic-bg">
+            <i class="fas fa-paw mr-2"></i>Races non classées
+          </h2>
+          <p class="text-sm font-normal opacity-80 mt- holographic-bg1">
+            Glissez les races d'ici vers le classement ci-dessus
+          </p>
+        </div>
+        <div class="p-4">
+          <div class="flex flex-wrap gap-3" id="unranked-breeds"></div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-12 text-center text-gray-600">
+        <p>
+          Données des races fournies par
+          <a
+            href="https://dog.ceo/dog-api/"
+            class="text-indigo-600 hover:underline"
+            >Dog CEO API</a
+          >
+        </p>
+        <p class="mt-2">Créé avec ❤️ pour moi-même</p>
+      </footer>
     </div>
 
     <script>
-        // Drag and drop functions
-        function allowDrop(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.add('drag-over');
-        }
+      // Drag and drop functions
+      function allowDrop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.add("drag-over");
+      }
 
-        function dragLeave(ev) {
-            ev.currentTarget.classList.remove('drag-over');
-        }
+      function dragLeave(ev) {
+        ev.currentTarget.classList.remove("drag-over");
+      }
 
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-            ev.target.classList.add('opacity-50');
-        }
+      function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        ev.target.classList.add("opacity-50");
+      }
 
-        function dragEnd(ev) {
-            ev.target.classList.remove('opacity-50');
-            document.querySelectorAll('.tier-column').forEach(el => {
-                el.classList.remove('drag-over');
-            });
-        }
+      function dragEnd(ev) {
+        ev.target.classList.remove("opacity-50");
+        document.querySelectorAll(".tier-column").forEach((el) => {
+          el.classList.remove("drag-over");
+        });
+      }
 
-        function drop(ev) {
-            ev.preventDefault();
-            ev.currentTarget.classList.remove('drag-over');
-            
-            const data = ev.dataTransfer.getData("text");
-            const draggedElement = document.getElementById(data);
-            
-            // Only move if it's a breed card
-            if (draggedElement.classList.contains('breed-card')) {
-                ev.currentTarget.appendChild(draggedElement);
-                saveTierList();
+      function drop(ev) {
+        ev.preventDefault();
+        ev.currentTarget.classList.remove("drag-over");
+
+        const data = ev.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+
+        // Only move if it's a breed card
+        if (draggedElement.classList.contains("breed-card")) {
+          ev.currentTarget.appendChild(draggedElement);
+          console.log(ev.currentTarget.id);
+          if (ev.currentTarget.id === "tier-s") {
+            draggedElement.classList.add("holographic-bg");
+            draggedElement.classList.add("card-shine-effect");
+          } else {
+            console.log("remove class holographic-bg");
+            draggedElement.classList.remove("holographic-bg");
+            draggedElement.classList.remove("card-shine-effect");
+          }
+
+          ev.currentTarget.appendChild(draggedElement);
+
+          console.log(`Draged To ${ev.currentTarget.id}`);
+          saveTierList();
+        }
+      }
+
+      // Fetch dog breeds from API
+      async function fetchDogBreeds() {
+        try {
+          const response = await fetch("https://dog.ceo/api/breeds/list/all");
+          const data = await response.json();
+
+          // Flatten breeds and sub-breeds
+          const breeds = [];
+          for (const breed in data.message) {
+            if (data.message[breed].length === 0) {
+              breeds.push(breed);
+            } else {
+              data.message[breed].forEach((subBreed) => {
+                breeds.push(`${subBreed} ${breed}`);
+              });
             }
+          }
+          console.log(breeds);
+          return breeds;
+        } catch (error) {
+          console.error("Error fetching dog breeds:", error);
+          return [];
         }
+      }
 
-        // Fetch dog breeds from API
-        async function fetchDogBreeds() {
-            try {
-                const response = await fetch('https://dog.ceo/api/breeds/list/all');
-                const data = await response.json();
-                
-                // Flatten breeds and sub-breeds
-                const breeds = [];
-                for (const breed in data.message) {
-                    if (data.message[breed].length === 0) {
-                        breeds.push(breed);
-                    } else {
-                        data.message[breed].forEach(subBreed => {
-                            breeds.push(`${subBreed} ${breed}`);
-                        });
-                    }
-                }
-                
-                return breeds;
-            } catch (error) {
-                console.error('Error fetching dog breeds:', error);
-                return [];
+      // Create breed card element
+      function createBreedCard(breed) {
+        const card = document.createElement("div");
+        card.id = `breed-${breed.breed.replace(/\s+/g, "-").toLowerCase()}`;
+        card.className =
+          "breed-card bg-white rounded-lg shadow-md cursor-move w-32 flex flex-col overflow-hidden";
+        card.draggable = true;
+        card.ondragstart = drag;
+        card.ondragend = dragEnd;
+
+        // Create image element (will be loaded later)
+        const imgDiv = document.createElement("div");
+        imgDiv.className = "breed-image w-full h-24 bg-gray-200";
+        imgDiv.id = `img-${breed.breed.replace(/\s+/g, "-").toLowerCase()}`;
+
+        // Breed name
+        const nameDiv = document.createElement("div");
+        nameDiv.className =
+          "p-2 text-center font-medium text-gray-800 truncate";
+        nameDiv.textContent = breed.fr;
+
+        // Breed link
+        const breedLink = document.createElement("a");
+        const linkText = document.createTextNode(`Voir ${breed.fr}`);
+        breedLink.appendChild(linkText);
+        breedLink.title = `Voir ${breed.fr}`;
+        breedLink.href = `https://www.dogbreedinfo.com/${breed.breed
+          .replace(/\s+/g, "")
+          .toLowerCase()}.htm`;
+        breedLink.className =
+          "tier-label bg-unranked py-3 rounded-lg text-white font-bold p-2 text-center font-medium text-gray-800 opacity-25 opacity-25 truncate hover:bg-gray-600 hover:opacity-75";
+        breedLink.target = "_blank";
+
+        card.appendChild(imgDiv);
+        card.appendChild(nameDiv);
+        card.appendChild(breedLink);
+
+        return card;
+      }
+
+      // Load breed images
+      async function loadBreedImages() {
+        const breedCards = document.querySelectorAll(".breed-card");
+
+        for (const card of breedCards) {
+          const breedId = card.id.replace("breed-", "");
+          const breedName = breedId.replace(/-/g, " ");
+
+          try {
+            // Format breed name for API
+            const apiBreedName = breedName.includes(" ")
+              ? breedName.split(" ").reverse().join("/")
+              : breedName;
+
+            const response = await fetch(
+              `https://dog.ceo/api/breed/${apiBreedName}/images/random`
+            );
+            const data = await response.json();
+
+            if (data.status === "success") {
+              const imgDiv = card.querySelector(".breed-image");
+              imgDiv.style.backgroundImage = `url(${data.message})`;
             }
+          } catch (error) {
+            console.error(`Error loading image for ${breedName}:`, error);
+          }
         }
+      }
 
-        // Create breed card element
-        function createBreedCard(breed) {
-            const card = document.createElement('div');
-            card.id = `breed-${breed.replace(/\s+/g, '-').toLowerCase()}`;
-            card.className = 'breed-card bg-white rounded-lg shadow-md cursor-move w-32 flex flex-col overflow-hidden';
-            card.draggable = true;
-            card.ondragstart = drag;
-            card.ondragend = dragEnd;
-            
-            // Create image element (will be loaded later)
-            const imgDiv = document.createElement('div');
-            imgDiv.className = 'breed-image w-full h-24 bg-gray-200';
-            imgDiv.id = `img-${breed.replace(/\s+/g, '-').toLowerCase()}`;
-            
-            // Breed name
-            const nameDiv = document.createElement('div');
-            nameDiv.className = 'p-2 text-center font-medium text-gray-800 truncate';
-            nameDiv.textContent = breed;
+      // Save tier list to localStorage
+      function saveTierList() {
+        const tierList = {
+          s: Array.from(document.getElementById("tier-s").children).map((el) =>
+            el.id.replace("breed-", "")
+          ),
+          a: Array.from(document.getElementById("tier-a").children).map((el) =>
+            el.id.replace("breed-", "")
+          ),
+          b: Array.from(document.getElementById("tier-b").children).map((el) =>
+            el.id.replace("breed-", "")
+          ),
+          c: Array.from(document.getElementById("tier-c").children).map((el) =>
+            el.id.replace("breed-", "")
+          ),
+          d: Array.from(document.getElementById("tier-d").children).map((el) =>
+            el.id.replace("breed-", "")
+          ),
+          f: Array.from(document.getElementById("tier-f").children).map((el) =>
+            el.id.replace("breed-", "")
+          ),
+          unranked: Array.from(
+            document.getElementById("unranked-breeds").children
+          ).map((el) => el.id.replace("breed-", "")),
+        };
 
-            // Breed link
-            const breedLink = document.createElement('a');
-            const linkText = document.createTextNode(`Voir ${breed}`);
-            breedLink.appendChild(linkText);
-            breedLink.title = `Voir ${breed}`;
-            breedLink.href = `https://www.dogbreedinfo.com/${breed.replace(/\s+/g, '').toLowerCase()}.htm`;
-            breedLink.className = 'tier-label bg-unranked py-3 rounded-lg text-white font-bold p-2 text-center font-medium text-gray-800 opacity-25 opacity-25 truncate hover:bg-gray-600 hover:opacity-75';
-            breedLink.target = '_blank';
-                
-            card.appendChild(imgDiv);
-            card.appendChild(nameDiv);
-            card.appendChild(breedLink);
-            
-            return card;
-        }
+        localStorage.setItem("dogTierList", JSON.stringify(tierList));
+      }
 
-        // Load breed images
-        async function loadBreedImages() {
-            const breedCards = document.querySelectorAll('.breed-card');
-            
-            for (const card of breedCards) {
-                const breedId = card.id.replace('breed-', '');
-                const breedName = breedId.replace(/-/g, ' ');
-                
-                try {
-                    // Format breed name for API
-                    const apiBreedName = breedName.includes(' ') 
-                        ? breedName.split(' ').reverse().join('/') 
-                        : breedName;
-                    
-                    const response = await fetch(`https://dog.ceo/api/breed/${apiBreedName}/images/random`);
-                    const data = await response.json();
-                    
-                    if (data.status === 'success') {
-                        const imgDiv = card.querySelector('.breed-image');
-                        imgDiv.style.backgroundImage = `url(${data.message})`;
-                    }
-                } catch (error) {
-                    console.error(`Error loading image for ${breedName}:`, error);
-                }
+      // Load tier list from localStorage
+      function loadTierList() {
+        const savedList = localStorage.getItem("dogTierList");
+        if (!savedList) return false;
+
+        const tierList = JSON.parse(savedList);
+
+        // Move breeds to their saved tiers
+        for (const tier in tierList) {
+          const container =
+            tier === "unranked"
+              ? document.getElementById("unranked-breeds")
+              : document.getElementById(`tier-${tier}`);
+
+          tierList[tier].forEach((breedId) => {
+            const breedCard = document.getElementById(`breed-${breedId}`);
+            console.log(`affection to saved tier ${tier} for ${breedCard}`);
+            if (tier === "s") {
+              breedCard.classList.add("holographic-bg");
+              breedCard.classList.add("card-shine-effect");
             }
-        }
-
-        // Save tier list to localStorage
-        function saveTierList() {
-            const tierList = {
-                s: Array.from(document.getElementById('tier-s').children).map(el => el.id.replace('breed-', '')),
-                a: Array.from(document.getElementById('tier-a').children).map(el => el.id.replace('breed-', '')),
-                b: Array.from(document.getElementById('tier-b').children).map(el => el.id.replace('breed-', '')),
-                c: Array.from(document.getElementById('tier-c').children).map(el => el.id.replace('breed-', '')),
-                d: Array.from(document.getElementById('tier-d').children).map(el => el.id.replace('breed-', '')),
-                f: Array.from(document.getElementById('tier-f').children).map(el => el.id.replace('breed-', '')),
-                unranked: Array.from(document.getElementById('unranked-breeds').children).map(el => el.id.replace('breed-', ''))
-            };
-            
-            localStorage.setItem('dogTierList', JSON.stringify(tierList));
-        }
-
-        // Load tier list from localStorage
-        function loadTierList() {
-            const savedList = localStorage.getItem('dogTierList');
-            if (!savedList) return false;
-            
-            const tierList = JSON.parse(savedList);
-            
-            // Move breeds to their saved tiers
-            for (const tier in tierList) {
-                const container = tier === 'unranked' 
-                    ? document.getElementById('unranked-breeds')
-                    : document.getElementById(`tier-${tier}`);
-                
-                tierList[tier].forEach(breedId => {
-                    const breedCard = document.getElementById(`breed-${breedId}`);
-                    if (breedCard) {
-                        container.appendChild(breedCard);
-                    }
-                });
+            if (breedCard) {
+              container.appendChild(breedCard);
             }
-            
-            return true;
+          });
         }
 
-        // Reset tier list
-        function resetTierList() {
-            if (confirm('Are you sure you want to reset your tier list? All rankings will be lost.')) {
-                localStorage.removeItem('dogTierList');
-                
-                // Move all breeds back to unranked
-                const unrankedContainer = document.getElementById('unranked-breeds');
-                const allBreeds = document.querySelectorAll('.breed-card');
-                
-                allBreeds.forEach(breed => {
-                    unrankedContainer.appendChild(breed);
-                });
-            }
-        }
+        return true;
+      }
 
-        // Initialize the app
-        async function initApp() {
-            const breeds = await fetchDogBreeds();
-            const unrankedContainer = document.getElementById('unranked-breeds');
-            
-            // Create breed cards
-            breeds.forEach(breed => {
-                const card = createBreedCard(breed);
-                unrankedContainer.appendChild(card);
-            });
-            
-            // Try to load saved tier list
-            const hasSavedList = loadTierList();
-            
-            // Load images after a short delay to allow DOM rendering
-            setTimeout(loadBreedImages, 500);
-            
-            // Add event listeners
-            document.getElementById('save-btn').addEventListener('click', () => {
-                saveTierList();
-                alert('Classement sauvegardé avec succès !');
-            });
-            
-            document.getElementById('reset-btn').addEventListener('click', resetTierList);
-            
-            // Add dragleave handlers
-            document.querySelectorAll('.tier-column').forEach(el => {
-                el.addEventListener('dragleave', dragLeave);
-            });
-        }
+      // Reset tier list
+      function resetTierList() {
+        if (
+          confirm(
+            "Are you sure you want to reset your tier list? All rankings will be lost."
+          )
+        ) {
+          localStorage.removeItem("dogTierList");
 
-        // Start the app when page loads
-        document.addEventListener('DOMContentLoaded', initApp);
+          // Move all breeds back to unranked
+          const unrankedContainer = document.getElementById("unranked-breeds");
+          const allBreeds = document.querySelectorAll(".breed-card");
+
+          allBreeds.forEach((breed) => {
+            unrankedContainer.appendChild(breed);
+          });
+        }
+      }
+
+      // Initialize the app
+      async function initApp() {
+        const breeds = [
+          {
+            breed: "affenpinscher",
+            fr: "Affenpinscher",
+          },
+          {
+            breed: "african",
+            fr: "Chien africain",
+          },
+          {
+            breed: "airedale",
+            fr: "Airedale Terrier",
+          },
+          {
+            breed: "akita",
+            fr: "Akita",
+          },
+          {
+            breed: "appenzeller",
+            fr: "Appenzeller",
+          },
+          {
+            breed: "kelpie australian",
+            fr: "Kelpie australien",
+          },
+          {
+            breed: "shepherd australian",
+            fr: "Berger australien",
+          },
+          {
+            breed: "indian bakharwal",
+            fr: "Bakharwal indien",
+          },
+          {
+            breed: "basenji",
+            fr: "Basenji",
+          },
+          {
+            breed: "beagle",
+            fr: "Beagle",
+          },
+          {
+            breed: "bluetick",
+            fr: "Bluetick",
+          },
+          {
+            breed: "borzoi",
+            fr: "Borzoi",
+          },
+          {
+            breed: "bouvier",
+            fr: "Bouvier",
+          },
+          {
+            breed: "boxer",
+            fr: "Boxer",
+          },
+          {
+            breed: "brabancon",
+            fr: "Brabançon",
+          },
+          {
+            breed: "briard",
+            fr: "Briard",
+          },
+          {
+            breed: "norwegian buhund",
+            fr: "Buhund norvégien",
+          },
+          {
+            breed: "boston bulldog",
+            fr: "Bulldog de Boston",
+          },
+          {
+            breed: "english bulldog",
+            fr: "Bulldog anglais",
+          },
+          {
+            breed: "french bulldog",
+            fr: "Bulldog français",
+          },
+          {
+            breed: "staffordshire bullterrier",
+            fr: "Bull Terrier Staffordshire",
+          },
+          {
+            breed: "australian cattledog",
+            fr: "Chien de troupeau australien",
+          },
+          {
+            breed: "cavapoo",
+            fr: "Cavapoo",
+          },
+          {
+            breed: "chihuahua",
+            fr: "Chihuahua",
+          },
+          {
+            breed: "indian chippiparai",
+            fr: "Chippiparai indien",
+          },
+          {
+            breed: "chow",
+            fr: "Chow Chow",
+          },
+          {
+            breed: "clumber",
+            fr: "Clumber",
+          },
+          {
+            breed: "cockapoo",
+            fr: "Cockapoo",
+          },
+          {
+            breed: "border collie",
+            fr: "Border Collie",
+          },
+          {
+            breed: "coonhound",
+            fr: "Coonhound",
+          },
+          {
+            breed: "cardigan corgi",
+            fr: "Corgi Cardigan",
+          },
+          {
+            breed: "cotondetulear",
+            fr: "Coton de Tuléar",
+          },
+          {
+            breed: "dachshund",
+            fr: "Teckel",
+          },
+          {
+            breed: "dalmatian",
+            fr: "Dalmatien",
+          },
+          {
+            breed: "great dane",
+            fr: "Grand Danois",
+          },
+          {
+            breed: "swedish danish",
+            fr: "Danois suédois",
+          },
+          {
+            breed: "scottish deerhound",
+            fr: "Deerhound écossais",
+          },
+          {
+            breed: "dhole",
+            fr: "Dhole",
+          },
+          {
+            breed: "dingo",
+            fr: "Dingo",
+          },
+          {
+            breed: "doberman",
+            fr: "Doberman",
+          },
+          {
+            breed: "norwegian elkhound",
+            fr: "Elkhound norvégien",
+          },
+          {
+            breed: "entlebucher",
+            fr: "Entlebucher",
+          },
+          {
+            breed: "eskimo",
+            fr: "Chien esquimau",
+          },
+          {
+            breed: "lapphund finnish",
+            fr: "Lapphund finlandais",
+          },
+          {
+            breed: "bichon frise",
+            fr: "Bichon frisé",
+          },
+          {
+            breed: "indian gaddi",
+            fr: "Gaddi indien",
+          },
+          {
+            breed: "germanshepherd",
+            fr: "Berger allemand",
+          },
+          {
+            breed: "indian greyhound",
+            fr: "Greyhound indien",
+          },
+          {
+            breed: "italian greyhound",
+            fr: "Greyhound italien",
+          },
+          {
+            breed: "groenendael",
+            fr: "Groenendael",
+          },
+          {
+            breed: "havanese",
+            fr: "Havanese",
+          },
+          {
+            breed: "afghan hound",
+            fr: "Chien afghan",
+          },
+          {
+            breed: "basset hound",
+            fr: "Basset hound",
+          },
+          {
+            breed: "blood hound",
+            fr: "Bloodhound",
+          },
+          {
+            breed: "english hound",
+            fr: "Chien anglais",
+          },
+          {
+            breed: "ibizan hound",
+            fr: "Chien ibizien",
+          },
+          {
+            breed: "plott hound",
+            fr: "Plott Hound",
+          },
+          {
+            breed: "walker hound",
+            fr: "Walker Hound",
+          },
+          {
+            breed: "husky",
+            fr: "Husky",
+          },
+          {
+            breed: "keeshond",
+            fr: "Keeshond",
+          },
+          {
+            breed: "kelpie",
+            fr: "Kelpie",
+          },
+          {
+            breed: "kombai",
+            fr: "Kombai",
+          },
+          {
+            breed: "komondor",
+            fr: "Komondor",
+          },
+          {
+            breed: "kuvasz",
+            fr: "Kuvasz",
+          },
+          {
+            breed: "labradoodle",
+            fr: "Labradoodle",
+          },
+          {
+            breed: "labrador",
+            fr: "Labrador",
+          },
+          {
+            breed: "leonberg",
+            fr: "Leonberg",
+          },
+          {
+            breed: "lhasa",
+            fr: "Lhassa Apso",
+          },
+          {
+            breed: "malamute",
+            fr: "Malamute",
+          },
+          {
+            breed: "malinois",
+            fr: "Malinois",
+          },
+          {
+            breed: "maltese",
+            fr: "Maltese",
+          },
+          {
+            breed: "bull mastiff",
+            fr: "Bull Mastiff",
+          },
+          {
+            breed: "english mastiff",
+            fr: "Mastiff anglais",
+          },
+          {
+            breed: "indian mastiff",
+            fr: "Mastiff indien",
+          },
+          {
+            breed: "tibetan mastiff",
+            fr: "Mastiff tibétain",
+          },
+          {
+            breed: "mexicanhairless",
+            fr: "Chien nu mexicain",
+          },
+          {
+            breed: "mix",
+            fr: "Mélange",
+          },
+          {
+            breed: "bernese mountain",
+            fr: "Bouvier bernois",
+          },
+          {
+            breed: "swiss mountain",
+            fr: "Bouvier suisse",
+          },
+          {
+            breed: "indian mudhol",
+            fr: "Mudhol indien",
+          },
+          {
+            breed: "newfoundland",
+            fr: "Terre-Neuve",
+          },
+          {
+            breed: "otterhound",
+            fr: "Otterhound",
+          },
+          {
+            breed: "caucasian ovcharka",
+            fr: "Ovcharka caucasien",
+          },
+          {
+            breed: "papillon",
+            fr: "Papillon",
+          },
+          {
+            breed: "indian pariah",
+            fr: "Pariah indien",
+          },
+          {
+            breed: "pekinese",
+            fr: "Pékinois",
+          },
+          {
+            breed: "pembroke",
+            fr: "Pembroke",
+          },
+          {
+            breed: "miniature pinscher",
+            fr: "Pinscher nain",
+          },
+          {
+            breed: "pitbull",
+            fr: "Pitbull",
+          },
+          {
+            breed: "german pointer",
+            fr: "Pointer allemand",
+          },
+          {
+            breed: "germanlonghair pointer",
+            fr: "Pointer à poil long allemand",
+          },
+          {
+            breed: "pomeranian",
+            fr: "Pomeranian",
+          },
+          {
+            breed: "medium poodle",
+            fr: "Caniche moyen",
+          },
+          {
+            breed: "miniature poodle",
+            fr: "Caniche nain",
+          },
+          {
+            breed: "standard poodle",
+            fr: "Caniche standard",
+          },
+          {
+            breed: "toy poodle",
+            fr: "Caniche toy",
+          },
+          {
+            breed: "pug",
+            fr: "Carlin",
+          },
+          {
+            breed: "puggle",
+            fr: "Puggle",
+          },
+          {
+            breed: "pyrenees",
+            fr: "Chien des Pyrénées",
+          },
+          {
+            breed: "indian rajapalayam",
+            fr: "Rajapalayam indien",
+          },
+          {
+            breed: "redbone",
+            fr: "Redbone",
+          },
+          {
+            breed: "chesapeake retriever",
+            fr: "Chesapeake Retriever",
+          },
+          {
+            breed: "curly retriever",
+            fr: "Retriever bouclé",
+          },
+          {
+            breed: "flatcoated retriever",
+            fr: "Retriever à poil plat",
+          },
+          {
+            breed: "golden retriever",
+            fr: "Golden Retriever",
+          },
+          {
+            breed: "rhodesian ridgeback",
+            fr: "Rhodesian Ridgeback",
+          },
+          {
+            breed: "rottweiler",
+            fr: "Rottweiler",
+          },
+          {
+            breed: "saluki",
+            fr: "Saluki",
+          },
+          {
+            breed: "samoyed",
+            fr: "Samoyède",
+          },
+          {
+            breed: "schipperke",
+            fr: "Schipperke",
+          },
+          {
+            breed: "giant schnauzer",
+            fr: "Schnauzer géant",
+          },
+          {
+            breed: "miniature schnauzer",
+            fr: "Schnauzer nain",
+          },
+          {
+            breed: "italian segugio",
+            fr: "Segugio italien",
+          },
+          {
+            breed: "english setter",
+            fr: "Setter anglais",
+          },
+          {
+            breed: "gordon setter",
+            fr: "Setter Gordon",
+          },
+          {
+            breed: "irish setter",
+            fr: "Setter irlandais",
+          },
+          {
+            breed: "sharpei",
+            fr: "Shar Pei",
+          },
+          {
+            breed: "english sheepdog",
+            fr: "Chien de berger anglais",
+          },
+          {
+            breed: "indian sheepdog",
+            fr: "Chien de berger indien",
+          },
+          {
+            breed: "shetland sheepdog",
+            fr: "Chien de berger des Shetland",
+          },
+          {
+            breed: "shiba",
+            fr: "Shiba Inu",
+          },
+          {
+            breed: "shihtzu",
+            fr: "Shih Tzu",
+          },
+          {
+            breed: "blenheim spaniel",
+            fr: "Blenheim Spaniel",
+          },
+          {
+            breed: "brittany spaniel",
+            fr: "Spaniel de Bretagne",
+          },
+          {
+            breed: "cocker spaniel",
+            fr: "Cocker Spaniel",
+          },
+          {
+            breed: "irish spaniel",
+            fr: "Spaniel irlandais",
+          },
+          {
+            breed: "japanese spaniel",
+            fr: "Spaniel japonais",
+          },
+          {
+            breed: "sussex spaniel",
+            fr: "Spaniel de Sussex",
+          },
+          {
+            breed: "welsh spaniel",
+            fr: "Spaniel gallois",
+          },
+          {
+            breed: "indian spitz",
+            fr: "Spitz indien",
+          },
+          {
+            breed: "japanese spitz",
+            fr: "Spitz japonais",
+          },
+          {
+            breed: "english springer",
+            fr: "Springer anglais",
+          },
+          {
+            breed: "stbernard",
+            fr: "Saint-Bernard",
+          },
+          {
+            breed: "american terrier",
+            fr: "Terrier américain",
+          },
+          {
+            breed: "australian terrier",
+            fr: "Terrier australien",
+          },
+          {
+            breed: "bedlington terrier",
+            fr: "Terrier de Bedlington",
+          },
+          {
+            breed: "border terrier",
+            fr: "Border Terrier",
+          },
+          {
+            breed: "cairn terrier",
+            fr: "Cairn Terrier",
+          },
+          {
+            breed: "dandie terrier",
+            fr: "Dandie Dinmont Terrier",
+          },
+          {
+            breed: "fox terrier",
+            fr: "Fox Terrier",
+          },
+          {
+            breed: "irish terrier",
+            fr: "Terrier irlandais",
+          },
+          {
+            breed: "kerryblue terrier",
+            fr: "Terrier Kerry Blue",
+          },
+          {
+            breed: "lakeland terrier",
+            fr: "Lakeland Terrier",
+          },
+          {
+            breed: "norfolk terrier",
+            fr: "Norfolk Terrier",
+          },
+          {
+            breed: "norwich terrier",
+            fr: "Norwich Terrier",
+          },
+          {
+            breed: "patterdale terrier",
+            fr: "Patterdale Terrier",
+          },
+          {
+            breed: "russell terrier",
+            fr: "Russell Terrier",
+          },
+          {
+            breed: "scottish terrier",
+            fr: "Terrier écossais",
+          },
+          {
+            breed: "sealyham terrier",
+            fr: "Sealyham Terrier",
+          },
+          {
+            breed: "silky terrier",
+            fr: "Silky Terrier",
+          },
+          {
+            breed: "tibetan terrier",
+            fr: "Terrier tibétain",
+          },
+          {
+            breed: "toy terrier",
+            fr: "Terrier toy",
+          },
+          {
+            breed: "welsh terrier",
+            fr: "Terrier gallois",
+          },
+          {
+            breed: "westhighland terrier",
+            fr: "West Highland Terrier",
+          },
+          {
+            breed: "wheaten terrier",
+            fr: "Wheaten Terrier",
+          },
+          {
+            breed: "yorkshire terrier",
+            fr: "Terrier Yorkshire",
+          },
+          {
+            breed: "tervuren",
+            fr: "Tervuren",
+          },
+          {
+            breed: "vizsla",
+            fr: "Vizsla",
+          },
+          {
+            breed: "spanish waterdog",
+            fr: "Chien d'eau espagnol",
+          },
+          {
+            breed: "weimaraner",
+            fr: "Weimaraner",
+          },
+          {
+            breed: "whippet",
+            fr: "Whippet",
+          },
+          {
+            breed: "irish wolfhound",
+            fr: "Loup irlandais",
+          },
+        ]; //await fetchDogBreeds();
+        const unrankedContainer = document.getElementById("unranked-breeds");
+
+        // Create breed cards
+        breeds.forEach((breed) => {
+          const card = createBreedCard(breed);
+          unrankedContainer.appendChild(card);
+        });
+
+        // Try to load saved tier list
+        const hasSavedList = loadTierList();
+
+        // Load images after a short delay to allow DOM rendering
+        setTimeout(loadBreedImages, 500);
+
+        // Add event listeners
+        document.getElementById("save-btn").addEventListener("click", () => {
+          saveTierList();
+          alert("Classement sauvegardé avec succès !");
+        });
+
+        document
+          .getElementById("reset-btn")
+          .addEventListener("click", resetTierList);
+
+        // Add dragleave handlers
+        document.querySelectorAll(".tier-column").forEach((el) => {
+          el.addEventListener("dragleave", dragLeave);
+        });
+      }
+
+      // Start the app when page loads
+      document.addEventListener("DOMContentLoaded", initApp);
     </script>
-</body>
+  </body>
 </html>
