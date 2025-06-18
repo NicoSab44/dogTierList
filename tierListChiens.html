@@ -84,27 +84,27 @@
             <div class="grid  gap-4 p-4">
                 <div class="flex items-center gap-4">
                     <div class="tier-label bg-tierS py-3 rounded-lg text-center w-24 text-white font-bold">Niveau S</div>
-                    <div class="tier-row bg-tierS/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-s" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    <div class="tier-row bg-tierS/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-s" ondrop="drop(event)" id=dropzone" ondragover="allowDrop(event)"></div>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="tier-label bg-tierA py-3 rounded-lg text-center w-24 text-white font-bold">Niveau A</div>
-                    <div class="tier-row bg-tierA/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-a" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    <div class="tier-row bg-tierA/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-a" ondrop="drop(event)" id=dropzone" ondragover="allowDrop(event)"></div>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="tier-label bg-tierB py-3 rounded-lg text-center w-24 text-white font-bold">Niveau B</div>
-                    <div class="tier-row bg-tierB/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-b" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    <div class="tier-row bg-tierB/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-b" ondrop="drop(event)" id=dropzone" ondragover="allowDrop(event)"></div>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="tier-label bg-tierC py-3 rounded-lg text-center w-24 text-white font-bold">Niveau C</div>
-                    <div class="tier-row bg-tierC/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-c" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    <div class="tier-row bg-tierC/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-c" ondrop="drop(event)"id=dropzone" ondragover="allowDrop(event)"></div>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="tier-label bg-tierD py-3 rounded-lg text-center w-24 text-white font-bold">Niveau D</div>
-                    <div class="tier-row bg-tierD/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-d" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    <div class="tier-row bg-tierD/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-d" ondrop="drop(event)" id=dropzone" ondragover="allowDrop(event)"></div>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="tier-label bg-tierF py-3 rounded-lg text-center w-24 text-white font-bold">Niveau F</div>
-                    <div class="tier-row bg-tierF/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-f" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    <div class="tier-row bg-tierF/20 rounded-xl p-3 flex-1 flex flex-wrap gap-3 min-h-[100px]" id="tier-f" ondrop="drop(event)" id=dropzone" ondragover="allowDrop(event)"></div>
                 </div>
             </div>
         </div>
@@ -163,7 +163,49 @@
                 saveTierList();
             }
         }
+        // drag n drop for mobile
+        const draggables = document.querySelectorAll('breed-card');
+        const dropzone = document.getElementById('dropzone');
 
+               draggables.forEach(draggable => {
+            let offsetX, offsetY;
+
+            // Événements tactiles pour le glisser-déposer
+            draggable.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                offsetX = touch.clientX - draggable.getBoundingClientRect().left;
+                offsetY = touch.clientY - draggable.getBoundingClientRect().top;
+                draggable.style.transition = 'none'; // Désactiver la transition pendant le déplacement
+            });
+
+            draggable.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                draggable.style.left = `${touch.clientX - offsetX}px`;
+                draggable.style.top = `${touch.clientY - offsetY}px`;
+            });
+
+            // Événement pour détecter le dépôt
+            dropzone.addEventListener('touchend', (e) => {
+                const dropzoneRect = dropzone.getBoundingClientRect();
+                const draggableRect = draggable.getBoundingClientRect();
+
+                // Vérifier si le draggable est dans la zone de dépôt
+                if (
+                    draggableRect.left < dropzoneRect.right &&
+                    draggableRect.right > dropzoneRect.left &&
+                    draggableRect.top < dropzoneRect.bottom &&
+                    draggableRect.bottom > dropzoneRect.top
+                ) {
+                    drop(e);
+                    console.log(`Déposé avec succès : ${draggable.textContent}`);
+                } else {
+                    console.log('Pas dans la zone de dépôt.');
+                }
+
+                // Réinitialiser la position
+                draggable.style.transition = 'left 0.2s, top 0.2s'; // Réactiver la transition
+            });
+        });
         // Fetch dog breeds from API
         async function fetchDogBreeds() {
             try {
