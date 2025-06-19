@@ -319,11 +319,11 @@
 
           // Flatten breeds and sub-breeds
           const breeds = [];
-          for (const breed in data.message) {
-            if (data.message[breed].length === 0) {
+          for (const breed in data) {
+            if (data[breed].length === 0) {
               breeds.push(breed);
             } else {
-              data.message[breed].forEach((subBreed) => {
+              data[breed].forEach((subBreed) => {
                 breeds.push(`${subBreed} ${breed}`);
               });
             }
