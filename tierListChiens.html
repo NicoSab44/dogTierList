@@ -321,13 +321,13 @@
           const breeds = [];
 
           // Iterate over the array of breed objects
-          data.forEach((breedObj) => {
-            // Push the breed name into the breeds array
-            breeds.push(breedObj.breed);
-          });
-
-          console.log(breeds);
-          return breeds;
+          //   data.forEach((breedObj) => {
+          //     // Push the breed name into the breeds array
+          //     breeds.push(breedObj.breed);
+          //   });
+          // console.log(breeds);
+          // return breeds;
+          if (data) return data;
         } catch (error) {
           console.error("Error fetching dog breeds:", error);
           return [];
