@@ -317,17 +317,15 @@
           const response = await fetch("breedsList.json");
           const data = await response.json();
 
-          // Flatten breeds and sub-breeds
+          // Create an array to hold the breeds
           const breeds = [];
-          for (const breed in data) {
-            if (data[breed].length === 0) {
-              breeds.push(breed);
-            } else {
-              data[breed].forEach((subBreed) => {
-                breeds.push(`${subBreed} ${breed}`);
-              });
-            }
-          }
+
+          // Iterate over the array of breed objects
+          data.forEach((breedObj) => {
+            // Push the breed name into the breeds array
+            breeds.push(breedObj.breed);
+          });
+
           console.log(breeds);
           return breeds;
         } catch (error) {
